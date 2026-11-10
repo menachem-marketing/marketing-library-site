@@ -9,10 +9,24 @@
 <body>
 <div id="root"></div>
 <script>
-window.instinctFile = {
-  initialRoute: "/",
-  route: function (p) { try { history.replaceState(null, "", "#" + p); } catch (e) {} }
-};
+window.instinctFile = (function () {
+  function fromHash() {
+    var h = location.hash;
+    return h.charAt(0) === "#" && h.charAt(1) === "/" ? h.slice(1) : "/";
+  }
+  window.addEventListener("hashchange", function () {
+    window.dispatchEvent(new CustomEvent("instinct-route", { detail: fromHash() }));
+  });
+  return {
+    initialRoute: fromHash(),
+    route: function (p) {
+      try {
+        var target = "#" + p;
+        if (location.hash !== target) history.replaceState(null, "", target);
+      } catch (e) {}
+    }
+  };
+})();
 </script>
 <script src="main.js"></script>
 </body>
